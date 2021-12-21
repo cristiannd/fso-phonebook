@@ -11,7 +11,7 @@ const PersonForm = ({
         name:{' '}
         <input
           type="text"
-          placeholder="Arto Hellas"
+          placeholder="Contact name"
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
         />
@@ -20,7 +20,7 @@ const PersonForm = ({
         number:{' '}
         <input
           type="number"
-          placeholder="3534187270"
+          placeholder="Contact number"
           value={newNumber}
           onChange={(e) => setNewNumber(e.target.value)}
         />
