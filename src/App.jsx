@@ -11,7 +11,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [personFilter, setPersonFilter] = useState([])
-  const [successfulMessage, setSuccessfulMessage] = useState(null)
+  const [notificationMessage, setNotificationMessage] = useState(null)
 
   // Get people
   useEffect(() => {
@@ -35,10 +35,13 @@ const App = () => {
         .then((res) => {
           setPersons(persons.concat(res))
 
-          setSuccessfulMessage('New person added!!')
+          setNotificationMessage({
+            text: `New person added!!`,
+            class: "successful-message"
+          })
 
           setTimeout(() => {
-            setSuccessfulMessage(null)
+            setNotificationMessage(null)
           }, 2500)
         })
         .catch((error) => console.log(error))
@@ -48,18 +51,31 @@ const App = () => {
           `${findPerson.name} is already added to phonebook, replace the old number with a new one?`
         )
       ) {
-        personServices.updatePerson(findPerson.id, newPerson)
+        personServices
+          .updatePerson(findPerson.id, newPerson)
+          .then((res) => {
+            console.log(res)
+            setNotificationMessage({
+              text: `Updated number of ${newName}`,
+              class: "successful-message"
+            })
+            setPersons(
+              persons.map((person) =>
+                person.name === findPerson.name ? newPerson : person
+              )
+            )
+          })
+          .catch(() => {
+            setNotificationMessage({
+              text: "Error 404 - Not found",
+              class: "error-message"
+            })
 
-        setPersons(
-          persons.map((person) =>
-            person.name === findPerson.name ? newPerson : person
-          )
-        )
-
-        setSuccessfulMessage(`Updated number of ${newName}`)
+            setPersons(persons.filter(person => person.id !== findPerson.id))
+          })
 
         setTimeout(() => {
-          setSuccessfulMessage(null)
+          setNotificationMessage(null)
         }, 2500)
       }
     }
@@ -90,7 +106,7 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
-      <Notification message={successfulMessage} />
+      <Notification message={notificationMessage} />
       <Filter handlePersonFilter={handlePersonFilter} />
       <h2>Add a new</h2>
       <PersonForm
