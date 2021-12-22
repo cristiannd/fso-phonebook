@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import Filter from './components/Filter'
+import Notification from './components/Notification'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 import personServices from './services/persons'
@@ -10,6 +11,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [personFilter, setPersonFilter] = useState([])
+  const [successfulMessage, setSuccessfulMessage] = useState(null)
 
   // Get people
   useEffect(() => {
@@ -30,7 +32,15 @@ const App = () => {
     if (findPerson === undefined) {
       personServices
         .create(newPerson)
-        .then((res) => setPersons(persons.concat(res)))
+        .then((res) => {
+          setPersons(persons.concat(res))
+
+          setSuccessfulMessage('New person added!!')
+
+          setTimeout(() => {
+            setSuccessfulMessage(null)
+          }, 2500)
+        })
         .catch((error) => console.log(error))
     } else {
       if (
@@ -39,11 +49,18 @@ const App = () => {
         )
       ) {
         personServices.updatePerson(findPerson.id, newPerson)
+
         setPersons(
           persons.map((person) =>
             person.name === findPerson.name ? newPerson : person
           )
         )
+
+        setSuccessfulMessage(`Updated number of ${newName}`)
+
+        setTimeout(() => {
+          setSuccessfulMessage(null)
+        }, 2500)
       }
     }
 
@@ -73,6 +90,7 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
+      <Notification message={successfulMessage} />
       <Filter handlePersonFilter={handlePersonFilter} />
       <h2>Add a new</h2>
       <PersonForm
